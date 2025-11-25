@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard • Kanban</title>
+
+  <!-- Single CSS file with the upgraded UI -->
+  <link rel="stylesheet" href="./dashboard.css" />
+
+  <!-- Minimal local helpers so JS can toggle visibility reliably -->
+  <style>
+    /* used by JS to hide/show elements */
+    .hidden { display: none !important; }
+
+    /* small helper for pending-count chip if your CSS doesn't include it */
+    .chip { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #eef2ff; font-size: 12px; }
+  </style>
+</head>
+
+<body>
+  <!-- Top Bar -->
+  <header class="bar">
+    <div class="brand">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path
+          d="M4 7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7zm3 0h10v2H7V7zm0 4h6v2H7v-2zm0 4h10v2H7v-2z" />
+      </svg>
+      <span>Work Sync</span>
+    </div>
+
+    <div class="actions">
+      <button id="refresh" type="button" class="btn ghost">Refresh</button>
+      <button id="logout" type="button" class="btn danger">Logout</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="dash-error" class="alert error" hidden></div>
+
+    <section class="layout">
+      <!-- Sidebar: Projects -->
+      <aside class="panel">
+        <div class="panel-head">
+          <h2>Your Projects</h2>
+          <span class="chip" id="project-count">list</span>
+        </div>
+
+        <button class="btn primary full" id="btn-open-project" type="button" style="margin:8px 0">+ New Project</button>
+
+        <div class="search">
+          <input id="search" placeholder="Search projects…" />
+        </div>
+
+        <div id="projects-list" class="list"></div>
+      </aside>
+
+      <!-- Main: Tasks -->
+      <section class="panel">
+        <div class="row between">
+          <div>
+            <h2 id="project-title" class="title-lg">Project</h2>
+            <div id="project-meta" class="meta"></div>
+          </div>
+          <button class="btn primary" id="btn-open-create" type="button">+ Create Task</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="panel soft" style="margin:10px 0 14px;">
+          <h3 class="h3">Filter Tasks</h3>
+          <div class="filters-inline" style="display: flex; justify-content: space-around; gap:12px; align-items:flex-start;">
+
+            <div class="field" style="display: inline;">
+              <label for="filter-user">Username</label>
+              <input id="filter-user" placeholder="" />
+            </div>
+
+            <!-- Pending tasks panel (visible only to managers via JS) -->
+            <div id="pending-panel" class="panel soft hidden" style="margin:12px 0; min-width:320px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px;">
+                <h3 class="h3" style="margin:0; font-size:15px;">Pending Tasks</h3>
+                <span id="pending-count" class="chip">0</span>
+              </div>
+              <div id="pending-list" style="max-height:260px; overflow:auto; padding:8px;">
+                <!-- pending cards injected here -->
+              </div>
+            </div>
+
+            <div class="field" style="display: inline;">
+              <label for="filter-priority">Priority</label>
+              <select id="filter-priority">
+                <option value="">Any</option>
+                <option value="low">LOW</option>
+                <option value="medium">MEDIUM</option>
+                <option value="high">HIGH</option>
+              </select>
+            </div>
+
+            <div class="field" style="display: inline;">
+              <label for="filter-status">Status</label>
+              <select id="filter-status">
+                <option value="">Any</option>
+                <option value="todo">TODO</option>
+                <option value="doing">DOING</option>
+                <option value="completed">COMPLETED</option>
+              </select>
+            </div>
+
+          </div>
+          <br>
+          <div style="padding-left: 40%;">
+            <button id="filter-apply" class="btn primary" type="button" style="margin-left:4px">Apply</button>
+            <button id="filter-clear" class="btn ghost" type="button">Clear</button>
+          </div>
+          <br>
+
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th width="60">ID</th>
+                  <th>Name</th>
+                  <th width="120">Status</th>
+                  <th width="120">Priority</th>
+                  <th width="160">Assigned To</th>
+                  <th width="160">Assigned By</th>
+                  <th width="170">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tasks-tbody">
+                <tr>
+                  <td colspan="7" class="empty">Select a project to see its tasks.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="task-pagination"></div>
+      </section>
+    </section>
+  </main>
+
+  <!-- Create Project Modal -->
+  <div id="project-modal" class="modal hidden" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-head">
+        <h2>Create Project</h2>
+        <button class="icon-btn" id="project-cancel" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="field">
+        <label>Name</label>
+        <input id="project-name" />
+      </div>
+
+      <div class="field">
+        <label>Description</label>
+        <textarea id="project-description" rows="3"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Members (optional)</label>
+        <div id="project-members" class="list inset"></div>
+      </div>
+
+      <div class="row end gap">
+        <button id="project-save" type="button" class="btn primary">Create</button>
+        <button id="project-cancel-2" type="button" class="btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Task Modal (replace existing create-modal block) -->
+  <div id="create-modal" class="modal hidden" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-head">
+        <h2>Create Task</h2>
+        <button class="icon-btn" id="create-cancel" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="field">
+        <label>Task Name</label>
+        <input id="create-name" />
+      </div>
+
+      <div class="field">
+        <label>Description</label>
+        <textarea id="create-description" rows="3"></textarea>
+      </div>
+
+      <div class="grid-2" style="gap:12px;">
+        <div class="field">
+          <label>Priority</label>
+          <select id="create-priority">
+            <option value="low">LOW</option>
+            <option value="medium" selected>MEDIUM</option>
+            <option value="high">HIGH</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Assigned To</label>
+          <select id="create-assignedto"></select>
+        </div>
+      </div>
+
+      <!-- optional create-status controlled by JS (hidden by default) -->
+      <div class="field hidden" id="create-status-field">
+        <label for="create-status">Status</label>
+        <select id="create-status">
+          <option value="todo">TODO</option>
+          <option value="doing">DOING</option>
+          <option value="completed">COMPLETED</option>
+        </select>
+      </div>
+
+      <!-- Create Task: ETA (date only) -->
+      <div class="field">
+        <label for="update-eta">ETA (date)</label>
+        <input id="create-eta" type="date" />
+      </div>
+
+      <div class="row end gap">
+        <button id="create-save" type="button" class="btn primary">Create</button>
+        <button id="create-cancel-2" type="button" class="btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Task Modal (replace existing update-modal block) -->
+  <div id="update-modal" class="modal hidden" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-head">
+        <h2>Update Task</h2>
+        <button class="icon-btn" id="update-cancel" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="field">
+        <label>Task Name</label>
+        <input id="update-name" />
+      </div>
+
+      <div class="field">
+        <label>Description</label>
+        <textarea id="update-description" rows="3"></textarea>
+      </div>
+
+      <div class="grid-3">
+        <div class="field">
+          <label>Status</label>
+          <select id="update-status">
+            <option value="todo">TODO</option>
+            <option value="doing">DOING</option>
+            <option value="completed">COMPLETED</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Priority</label>
+          <select id="update-priority">
+            <option value="low">LOW</option>
+            <option value="medium">MEDIUM</option>
+            <option value="high">HIGH</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Assigned To</label>
+          <select id="update-assignedto"></select>
+        </div>
+      </div>
+
+      <!-- Update Task: ETA (date only) -->
+      <div class="field">
+        <label for="update-eta">ETA (date)</label>
+        <input id="update-eta" type="date" />
+      </div>
+
+      <div class="row end gap">
+        <button id="update-save" type="button" class="btn primary">Update</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Details Modal -->
+  <div id="details-modal" class="modal hidden" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-head">
+        <h2>Task Details</h2>
+        <button class="icon-btn" id="details-close" aria-label="Close">&times;</button>
+      </div>
+      <!-- replaced <pre> with a container that will receive formatted HTML -->
+      <div id="details-body" style="max-height:60vh; overflow:auto; padding:12px; border-radius:6px; background:#fff;">
+      </div>
+    </div>
+  </div>
+
+  <footer class="footnote">
+    Managers see projects they created. Employees see projects they are a member of.
+  </footer>
+
+  <!-- Keep your existing JS file -->
+  <script src="./dashboard.js" defer></script>
+</body>
+
+</html>

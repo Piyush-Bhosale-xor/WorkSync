@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign up</title>
+  <link rel="stylesheet" href="./signup.css">
+</head>
+<body>
+  <header class="bar">
+    <div class="brand">Work Sync</div>
+    <div class="actions">
+      <!-- <input id="api-base" placeholder="http://127.0.0.1:8000">
+      <button id="set-api">Set API</button> -->
+    </div>
+  </header>
+
+  <main class="center">
+    <section class="card">
+      <h1>Create account</h1>
+      <p class="muted">Sign up to start using projects and tasks</p>
+
+      <div class="field">
+        <label for="signup-username">Username</label>
+        <input id="signup-username" autocomplete="username" placeholder="yourname">
+      </div>
+
+      <div class="field">
+        <label for="signup-email">Email</label>
+        <input id="signup-email" type="email" autocomplete="email" placeholder="you@example.com">
+      </div>
+
+      <div class="field">
+        <label for="signup-password">Password</label>
+        <input id="signup-password" type="password" autocomplete="new-password" placeholder="Create a password">
+      </div>
+
+      <div class="field">
+        <label for="signup-role">Role</label>
+        <select id="signup-role">
+          <option value="employee">Employee</option>
+          <option value="manager">Manager</option>
+        </select>
+      </div>
+
+      <div id="signup-error" class="alert error" hidden></div>
+      <div id="signup-success" class="alert success" hidden></div>
+
+      <button id="signup-btn" class="primary">Create account</button>
+
+      <p class="muted small">
+        Already have an account?
+        <a href="./login.html">Log in</a>
+      </p>
+    </section>
+  </main>
+
+  <script src="./signup.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login</title>
+  <link rel="stylesheet" href="./login.css">
+</head>
+<body>
+  <header class="bar">
+    <div class="brand">Work Sync</div>
+    <div class="actions">
+      <input id="api-base" placeholder="http://127.0.0.1:8000">
+      <button id="set-api">Set API</button>
+    </div>
+  </header>
+
+  <main class="center">
+    <section class="card">
+      <h1>Welcome back</h1>
+      <p class="muted">Sign in to access your projects and tasks</p>
+
+      <div class="field">
+        <label for="login-username">Username</label>
+        <input id="login-username" autocomplete="username" placeholder="yourname">
+      </div>
+
+      <div class="field">
+        <label for="login-password">Password</label>
+        <input id="login-password" type="password" autocomplete="current-password" placeholder="••••••••">
+      </div>
+
+      <div id="login-error" class="alert error" hidden></div>
+      <div id="login-success" class="alert success" hidden></div>
+
+      <button id="login-btn" class="primary">Log in</button>
+
+      <p class="muted small">
+        New here?
+        <a href="./signup.html">Create an account</a>
+      </p>
+    </section>
+  </main>
+
+  <script src="./login.js"></script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+/* =========================
+   Kanban Dashboard (Enhanced)
+   ========================= */
+
+/* ---------- Theme ---------- */
+:root {
+  --ink: #0b1a2a;
+  --ink-2: #0f2742;
+  --muted: #547aa5;
+  --sky: #1d9bf0;
+  --sky-600: #0f82cf;
+  --bg: #f6faff;
+  --panel: #ffffff;
+  --line: #dbeafe;
+  --accent: #e8f3ff;
+  --danger: #ef4444;
+  --success: #38aa55; /* new: green for completed tasks */
+  --shadow: 0 10px 30px rgba(2,84,164,.12);
+  --shadow-soft: 0 8px 22px rgba(2,84,164,.08);
+  --radius: 14px;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at -10% -10%, #eaf4ff 0%, transparent 60%),
+    linear-gradient(180deg, #f8fbff 0%, #ffffff 40%);
+  color: var(--ink);
+  font: 15.5px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial;
+}
+h1, h2, h3 { margin: 0; color: var(--ink); }
+a { color: var(--sky); }
+.container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+
+/* ---------- Header ---------- */
+.bar {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(0deg, #f3f9ff, #eaf4ff);
+  backdrop-filter: blur(6px);
+}
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  color: var(--sky-600); font-weight: 800; letter-spacing: .2px;
+}
+.actions { display: flex; align-items: center; gap: 8px; }
+.actions input {
+  padding: 10px 12px; min-width: 260px;
+  border: 1px solid var(--line); border-radius: 10px; background: #fff;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  padding: 10px 12px; border: 0; border-radius: 10px;
+  background: #edf2f7; color: var(--ink); cursor: pointer;
+  transition: all .18s ease; box-shadow: 0 0 0 transparent;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-soft); }
+.btn.primary { background: var(--sky); color: #fff; }
+.btn.primary:hover { background: var(--sky-600); }
+.btn.ghost { background: #e8f1fb; color: var(--ink); }
+.btn.ghost:hover { background: #e2ecfa; }
+.btn.danger { background: #ffe5e8; color: #9b1c1c; }
+.btn.full { width: 100%; }
+.icon-btn {
+  background: #f2f6fc; border: 1px solid var(--line); color: var(--ink);
+  width: 34px; height: 34px; border-radius: 10px; cursor: pointer;
+}
+
+/* ---------- Layout ---------- */
+.layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+
+/* ---------- Panels ---------- */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+.panel.soft {
+  box-shadow: none;
+  border-style: dashed;
+  background: #fcfeff;
+}
+.panel-head { display: flex; align-items: center; justify-content: space-between; }
+.title-lg { font-size: 20px; letter-spacing: .2px; }
+
+.row { display: flex; align-items: center; gap: 10px; }
+.row.between { justify-content: space-between; }
+.row.end { justify-content: flex-end; }
+.row.gap { gap: 8px; }
+
+/* ---------- Sidebar list ---------- */
+.search { margin: 8px 0 10px; }
+.search input {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--line);
+  border-radius: 10px; background: #fff;
+}
+.list {
+  display: flex; flex-direction: column; gap: 8px;
+  max-height: 65vh; overflow: auto;
+}
+.list.inset {
+  padding: 8px; border: 1px solid var(--line);
+  border-radius: 10px; background: #fbfdff;
+}
+.item {
+  padding: 10px; border: 1px solid var(--line); border-radius: 10px;
+  cursor: pointer; transition: all .15s ease; background: #fff;
+}
+.item:hover { background: #f6fbff; }
+.item.active {
+  border-color: var(--sky);
+  box-shadow: 0 0 0 3px rgba(29,155,240,.15) inset;
+}
+
+/* ---------- Chips & meta ---------- */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--muted);
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 2px 8px; background: #fff;
+}
+.meta { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 12px; }
+.muted { color: var(--muted); }
+
+/* ---------- Table ---------- */
+.table-wrap { border: 1px solid var(--line); border-radius: 12px; overflow: auto; }
+.table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.table thead th {
+  position: sticky; top: 0; z-index: 1;
+  background: linear-gradient(180deg, #f6fbff, #eef6ff);
+  border-bottom: 1px solid var(--line);
+  padding: 12px 10px; text-align: left;
+  font-weight: 700; color: var(--ink-2);
+}
+.table td { padding: 12px 10px; border-bottom: 1px solid var(--line); }
+.table tbody tr:hover { background: #fbfdff; }
+/* Ensure row highlight applies to cells (higher specificity) */
+.table tbody tr.row-delayed td {
+  background-color: rgba(239, 68, 68, 0.06);
+}
+.table tbody tr.row-delayed {
+  border-left: 4px solid rgba(239, 68, 68, 0.18);
+}
+
+.table tbody tr.row-completed td {
+  background-color: rgba(56, 170, 85, 0.06);
+}
+.table tbody tr.row-completed {
+  border-left: 4px solid rgba(56, 170, 85, 0.18);
+}
+
+/* keep hover behaviour but respect explicit background */
+.table tbody tr.row-delayed:hover td,
+.table tbody tr.row-completed:hover td {
+  filter: brightness(0.98);
+}
+
+.empty { color: var(--muted); padding: 10px 2px; }
+
+/* --- Row highlights: delayed (red) and completed (green) --- */
+tr.row-delayed {
+  background-color: rgba(239, 68, 68, 0.06);
+  border-left: 4px solid rgba(239, 68, 68, 0.18);
+}
+tr.row-completed {
+  background-color: rgba(56, 170, 85, 0.06);
+  border-left: 4px solid rgba(56, 170, 85, 0.18);
+}
+.table tbody tr.row-delayed:hover,
+.table tbody tr.row-completed:hover {
+  filter: brightness(0.98);
+}
+
+/* optional small status badges */
+.badge-status {
+  font-weight: 700; font-size: 12px;
+  padding: 4px 8px; border-radius: 999px;
+  display: inline-block; vertical-align: middle;
+}
+.badge-status.delayed {
+  color: var(--danger);
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.12);
+}
+.badge-status.completed {
+  color: var(--success);
+  background: rgba(56,170,85,0.08);
+  border: 1px solid rgba(56,170,85,0.12);
+}
+
+/* ---------- Status & priority pills ---------- */
+.status { font-weight: 500; padding: 4px 5px; border-radius: 999px; display: inline-block; }
+.status.todo { color: #475569; background: #eef2f7; }
+.status.doing { color: #8a4a0a; background: #fff2db; }
+.status.completed { color: #14532d; background: #e7f7ee; }
+
+.priority-low {
+  color: #0b5e2b; background: #e6f8ee;
+  padding: 4px 10px; border-radius: 999px;
+}
+.priority-medium {
+  color: #6b4c0a; background: #fff3d8;
+  padding: 4px 10px; border-radius: 999px;
+}
+.priority-high {
+  color: #7c1323; background: #ffe5ea;
+  padding: 4px 10px; border-radius: 999px;
+}
+
+/* ---------- Alerts ---------- */
+.alert {
+  padding: 10px; border-radius: 10px; margin: 12px 0;
+}
+.alert.error {
+  background: #fee2e2; border: 1px solid #fecaca; color: #b91c1c;
+}
+
+/* ---------- Forms ---------- */
+.field {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-bottom: 10px;
+}
+.field label { font-size: 8px; color: var(--muted); }
+input, select, textarea {
+  padding: 1px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--sky);
+  box-shadow: 0 0 0 3px rgba(29,155,240,.15);
+}
+
+/* =====================================================
+   FILTER BAR — force a single horizontal line
+   ===================================================== */
+.panel .filters-inline {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
+  padding: 8px 0;
+}
+.panel .filters-inline .field {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 !important;
+}
+.panel .filters-inline .field label {
+  margin: 0; white-space: nowrap;
+}
+.panel .filters-inline input,
+.panel .filters-inline select {
+  height: 42px; line-height: 42px;
+}
+.panel .filters-inline .btn {
+  height: 42px !important;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 14px;
+}
+@media (max-width: 560px) {
+  .panel .filters-inline .field {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+}
+
+/* ---------- Grids ---------- */
+.grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+
+/* ---------- Modals ---------- */
+.modal {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50;
+  background: rgba(9,30,66,.35); backdrop-filter: blur(2px);
+}
+.hidden { display: none; }
+.modal-content {
+  width: min(560px, 92vw);
+  background: #fff; color: var(--ink);
+  border: 1px solid var(--line); border-radius: 16px;
+  padding: 16px; box-shadow: var(--shadow);
+}
+.modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+
+/* ---------- Footer ---------- */
+.footnote { padding: 10px 16px; color: var(--muted); font-size: 13px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
+@media (max-width: 560px) {
+  .actions { flex-wrap: wrap; }
+  .actions input { min-width: 200px; }
+}
+
+/* ---------- Nice Scrollbars (WebKit) ---------- */
+.list::-webkit-scrollbar,
+.table-wrap::-webkit-scrollbar { width: 10px; height: 10px; }
+.list::-webkit-scrollbar-thumb,
+.table-wrap::-webkit-scrollbar-thumb {
+  background: #cfe4ff;
+  border-radius: 999px;
+  border: 2px solid #f1f7ff;
+}
